@@ -9,4 +9,5 @@ Angularjs v.1.x;
 (nd: to use correctly the directive the input tag has to be wrap in a parent container tag)
 - the style applied uses two classe for the input: 'is-valid', 'is-invalid';
 - a class 'text-danger' is embedded on the small tag that wrap the text message and that is injected into the dom.
+- the directive use a $filter dependency to translate the text.(see: https://angular-gettext.rocketeer.be);
 You'll find a simple implemenation based on required attribute.

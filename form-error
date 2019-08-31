@@ -7,27 +7,53 @@ function formValidation($filter) {
             // console.log('element', element)
             // console.log('attrs', attrs)
             // console.log('form', form)
-            
+
             // when dom is loaded then set watchers
             element.ready(() => {
-                
-                
+
+                // var submitted = false;
+                submitAlert();
                 detectInputRequired();
-                
-                // declarations 
-                
+
+
+                // declarations
+                function submitAlert() {
+                    var clearWatchSubmit = $scope.$watch(() => {
+                        return form.$submitted
+                    }, (newVal, oldVal) => {
+                        console.log('sub n', newVal)
+                        console.log('sub o', oldVal)
+
+                        if (newVal && form.$invalid) {
+                            var msg = $filter('translate')('Please compile the form before saving');
+                            alert(msg);
+                            var inputInList = form.$error.required;
+                            _.forEach(inputInList, (data, index) => {
+                                var input = form[data.$name];
+                                console.log('input', input)
+                                //what kind of validation are you checking?
+
+                                attachErrorMessage(input, 'true', '', null);
+                                clearWatchSubmit();
+                            })
+                        }
+                    })
+
+                }
+
                 function detectInputRequired() {
                     // console.log('form', form)
                     // how many input are registered for validation:
                     var inputInList = form.$error.required;
-                    _.forEach(inputInList, (data, index) => {                     
+                    _.forEach(inputInList, (data, index) => {
                         var input = form[data.$name];
+                        console.log('input', input)
                         //what kind of validation are you checking?
                         if (input.$error.required)
                             watchersForErrors('required', input, '*Field is mandatory. Please fill the form before saving')
                     })
                 }
-                
+
                 function watchersForErrors(type, input, text) {
                     $scope.$watch(() => {
                             return input.$error[type];
@@ -41,12 +67,14 @@ function formValidation($filter) {
                     var el = input.$$element[0]; // the element of the input
                     var parent = el.parentNode; // the parente of the element
                     var classList = el.classList; // the class of the element
-                    // console.log('input', input.$name);
-                    if (input.$pristine) return; // when form is loaded do nothing
+                    // console.log('input pristine', input.$pristine);
+                    // console.log('input sub', form.$submitted);
+                    if (!form.$submitted) return; // when form is loaded do nothing
                     if (error) {
                         classList.remove('is-valid');
                         classList.add('is-invalid');
-                        // inject the message                      
+                        // inject the message
+                        if (!text) return;
                         var p = document.createElement("small");
                         p.setAttribute('class', 'text-danger my-1');
                         p.setAttribute('id', input.$name + '-' + type)
@@ -55,6 +83,7 @@ function formValidation($filter) {
                     } else {
                         classList.remove('is-invalid');
                         classList.add('is-valid');
+                        if (!text) return;
                         var p = document.getElementById(input.$name + '-' + type);
                         // remove the message
                         if (!!p)
@@ -62,7 +91,6 @@ function formValidation($filter) {
                     }
                 }
 
-                
 
             })
         }
@@ -70,3 +98,21 @@ function formValidation($filter) {
 }
 
 formValidation.$inject = ['$filter'];
+
+// build in error
+/*
+email
+max
+maxlength
+min
+minlength
+number
+pattern
+required
+url
+date
+datetimelocal
+time
+week
+month
+*/

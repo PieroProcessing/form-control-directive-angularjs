@@ -21,16 +21,14 @@ function formValidation($filter) {
                     var clearWatchSubmit = $scope.$watch(() => {
                         return form.$submitted
                     }, (newVal, oldVal) => {
-                        console.log('sub n', newVal)
-                        console.log('sub o', oldVal)
-
+                       
                         if (newVal && form.$invalid) {
                             var msg = $filter('translate')('Please compile the form before saving');
                             alert(msg);
                             var inputInList = form.$error.required;
                             _.forEach(inputInList, (data, index) => {
                                 var input = form[data.$name];
-                                console.log('input', input)
+                                
                                 //what kind of validation are you checking?
 
                                 attachErrorMessage(input, 'true', '', null);
@@ -47,7 +45,7 @@ function formValidation($filter) {
                     var inputInList = form.$error.required;
                     _.forEach(inputInList, (data, index) => {
                         var input = form[data.$name];
-                        console.log('input', input)
+                        
                         //what kind of validation are you checking?
                         if (input.$error.required)
                             watchersForErrors('required', input, '*Field is mandatory. Please fill the form before saving')

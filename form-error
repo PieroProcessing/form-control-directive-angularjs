@@ -1,0 +1,72 @@
+function formValidation($filter) {
+    return {
+        restrict: 'EA',
+        require: '^form',
+        link: function ($scope, element, attrs, form) {
+            // console.log('scope', $scope)
+            // console.log('element', element)
+            // console.log('attrs', attrs)
+            // console.log('form', form)
+            
+            // when dom is loaded then set watchers
+            element.ready(() => {
+                
+                
+                detectInputRequired();
+                
+                // declarations 
+                
+                function detectInputRequired() {
+                    // console.log('form', form)
+                    // how many input are registered for validation:
+                    var inputInList = form.$error.required;
+                    _.forEach(inputInList, (data, index) => {                     
+                        var input = form[data.$name];
+                        //what kind of validation are you checking?
+                        if (input.$error.required)
+                            watchersForErrors('required', input, '*Field is mandatory. Please fill the form before saving')
+                    })
+                }
+                
+                function watchersForErrors(type, input, text) {
+                    $scope.$watch(() => {
+                            return input.$error[type];
+                        },
+                        (newVal, oldVal) => {
+                            attachErrorMessage(input, newVal, text, type);
+                        });
+                }
+
+                function attachErrorMessage(input, error, text, type) {
+                    var el = input.$$element[0]; // the element of the input
+                    var parent = el.parentNode; // the parente of the element
+                    var classList = el.classList; // the class of the element
+                    // console.log('input', input.$name);
+                    if (input.$pristine) return; // when form is loaded do nothing
+                    if (error) {
+                        classList.remove('is-valid');
+                        classList.add('is-invalid');
+                        // inject the message                      
+                        var p = document.createElement("small");
+                        p.setAttribute('class', 'text-danger my-1');
+                        p.setAttribute('id', input.$name + '-' + type)
+                        p.innerHTML += $filter('translate')(text);
+                        parent.appendChild(p)
+                    } else {
+                        classList.remove('is-invalid');
+                        classList.add('is-valid');
+                        var p = document.getElementById(input.$name + '-' + type);
+                        // remove the message
+                        if (!!p)
+                            parent.removeChild(p)
+                    }
+                }
+
+                
+
+            })
+        }
+    };
+}
+
+formValidation.$inject = ['$filter'];
